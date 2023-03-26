@@ -1,6 +1,6 @@
 'use strict'
 
-//global variable
+//global variables
 var tdis,dist;
 var drone_velocity =0.0001;
 const time_int = 5;
