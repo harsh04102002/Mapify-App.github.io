@@ -7,23 +7,24 @@ const time_int = 5;
 var latlngs = [];
 var route = [];
 var len;
+var id=12876169;
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const form = document.querySelector('.form');
 const delivery = document.querySelector('.delivery');
 const pickup = document.querySelector('.pickup');
 // const hidden = document.querySelector('.ds');
 const containerWorkouts = document.querySelector('.workouts');
-// const containerWorkout = document.querySelector('.workout');
+// const containerWorkout = document.querySelector('.order');
 const inputType = document.querySelector('.form__input--type');
-const inputDistance = document.querySelector('.form__input--distance');
+const inputAera = document.querySelector('.form__input--aera');
 const inputDuration = document.querySelector('.form__input--duration');
-const inputCadence = document.querySelector('.form__input--cadence');
-const inputElevation = document.querySelector('.form__input--elevation');
+// const inputCadence = document.querySelector('.form__input--cadence');
+const inputWeight = document.querySelector('.form__input--weight');
 // point generator function 
 function getPoint(latlngs, cur_lat, cur_lng) {
      tdis = Math.pow((latlngs[len-1][0] - latlngs[len-2][0]), 2) + Math.pow((latlngs[len-1][1] - latlngs[len-2][1]), 2);
     tdis = Math.sqrt(tdis);
-    console.log('vel',drone_velocity);
+    // console.log('vel',drone_velocity);
     var param =  drone_velocity / tdis;
     // var prev_dis = tdis;
   
@@ -54,41 +55,47 @@ function deg2rad(deg) {
 }
 
 
-class Workout{
-constructor(coords,duration,distance){
+class Order{
+constructor(type,coords,duration,distance,aera,weight){
 this.coords=coords;
 this.duration=duration;
 this.distance=distance;
+this.aera=aera;
+this.weight=weight;
+
+
 };
 
-
+calcprice() {
+  return Math.floor(this.aera*this.weight/this.duration);
 }
-class Running extends Workout {
-    constructor(type,coords,duration,distance,cadence){
-   super(coords,duration,distance);
-    this.cadence=cadence;
-    this.type=type;    
-
 }
+// class Running extends Order {
+//     constructor(type,coords,duration,distance,cadence){
+//    super(coords,duration,distance);
+//     this.cadence=cadence;
+//     this.type=type;    
 
-calcPace(){
+// }
+
+// calcPace(){
     
-    return this.distance/this.duration;
-}
+//     return this.distance/this.duration;
+// }
 
-}
+// }
 
 
-class Cycling extends Workout {
-    constructor(type,coords,duration,distance,elevationGain){
-   super(coords,duration,distance);
-    this.elevationGain=elevationGain;    
-   this.type=type;
-}
-calcPace(){
-    return this.distance/this.duration;
-}
-}
+// class Cycling extends Order {
+//     constructor(type,coords,duration,distance,elevationGain){
+//    super(coords,duration,distance);
+//     this.elevationGain=elevationGain;    
+//    this.type=type;
+// }
+// calcPace(){
+//     return this.distance/this.duration;
+// }
+// }
 class  App{
     
    
@@ -184,7 +191,7 @@ for (idx = 1; ; idx++)
 
 }
 _newWorkout(e){
-  let workout;
+  let order;
   e.preventDefault();
   
   this.month=months[new Date().getMonth()];
@@ -195,21 +202,29 @@ _newWorkout(e){
     const {lat,lng}=this.#mapEvent.latlng;
     const brr=[lat,lng]
     //check data validity 
-     if(inputDuration.value<0)
+    if(inputDuration.value<0||inputAera.value<0||inputWeight.value<0)
      {
         alert('Input values should be positive');
      }
+     else if(inputDuration.value==0||inputAera.value==0||inputWeight.value==0)
+     {
+        alert('Input Values should not be empty');
+     }
+     else if(inputWeight.value>500)
+     {
+        alert('Weight should be less tha 500 gm');
+     }
      else{
-    //if workout ,create workout object
-     if(inputType.value=='lightweight')
-    {    workout=new Running('light',brr,inputDuration.value,(dist),10);
-         this.event='Order of '+this.month+' '+this.date;
-    }
+    //if order ,create order object
+    //  if(inputType.value=='lightweight')
+    // {    order=new Running('light',brr,inputDuration.value,(dist),10);
+        //  this.event='Order of '+this.month+' '+this.date;
+    // }
         //if cyceling create  cycling object
-    else{
-        workout=new Cycling('heavy',brr,inputDuration.value,dist,10);
+    // else{
+        order=new Order(inputType.value,brr,inputDuration.value,dist,inputAera.value,inputWeight.value);
          this.event='Order of '+this.month+' '+this.date;
-    }   
+    // }   
     //render this data on map
     // L.marker(brr).addTo(this.#map)
     //     .bindPopup(L.popup({
@@ -250,16 +265,17 @@ _newWorkout(e){
     pickup.classList.remove('hidden');
     delivery.classList.add('hidden');
     //render this data as block
-     this._renderBlock(workout);
+    id++;
+     this._renderBlock(order);
     
      //hide the form
-     this._hideform(workout);
+     this._hideform(order);
             }
     
 }
 
-_hideform(workout){
-    inputDuration.value=inputElevation.value='';
+_hideform(order){
+    inputDuration.value=inputWeight.value='';
     form.style.display='none';
     form.classList.add('hidden');
     setTimeout(() => (form.style.display = 'grid'), 2000);
@@ -267,50 +283,52 @@ _hideform(workout){
   }
 
   
-_renderBlock(workout){
+_renderBlock(order){
     
-     let html=`<li class="workout workout--running" data-id="1234567890">
+     let html=`<li class="order order--running" data-id="1234567890">
      <h2 class="workout__title">${this.event}</h2>
      <div class="workout__details">
-     <span class="workout__icon">${workout.type=='run'?'🏃‍♂️':'🚴‍♀️'}</span>
-     <span class="workout__value">${workout.distance}</span>
-     <span class="workout__unit">km</span>
+     <span class="workout__icon">ID</span>
+     <span class="workout__value">${id}</span>
+   
    </div>  
      <div class="workout__details">
-       <span class="workout__icon">⏱</span>
-       <span class="workout__value">${workout.duration}</span>
-       <span class="workout__unit">min</span>
+       <span class="workout__icon">📐</span>
+       <span class="workout__value">${order.aera}</span>
+       <span class="workout__unit">cm²</span>
      </div>
      <div class="workout__details">
-     <span class="workout__icon">⚡️</span>
-     <span class="workout__value">${workout.calcPace()}</span>
-     <span class="workout__unit">km/min</span>
+     <span class="workout__icon">⚖️</span>
+     <span class="workout__value">${order.weight}</span>
+     <span class="workout__unit">gm</span>
    </div>
+   <div class="workout__details">
+        <span class="workout__icon">💰</span>
+        <span class="workout__value">${order.calcprice()}</span>
+        <span class="workout__unit">Rupess</span>
+      </div>
      `;
-     if(workout.type=='run')
-     {
-        html+=`   
-      <div class="workout__details">
-        <span class="workout__icon">🦶🏼</span>
-        <span class="workout__value">${workout.cadence}</span>
-        <span class="workout__unit">spm</span>
-      </div>`
-     }
-     else
-     {
-        html+=`   
-      <div class="workout__details">
-        <span class="workout__icon">🦶🏼</span>
-        <span class="workout__value">${workout.elevationGain}</span>
-        <span class="workout__unit">spm</span>
-      </div>`
-     }
+    //  if(order.type=='run')
+     
+      //   html+=`   
+      // `
+     
+
+    //  else
+    //  {
+    //     html+=`   
+    //   <div class="workout__details">
+    //     <span class="workout__icon">🦶🏼</span>
+    //     <span class="workout__value">${order.duration}</span>
+    //     <span class="workout__unit">spm</span>
+    //   </div>`
+    //  }
      html+=`<\li>`;
      form.insertAdjacentHTML('afterend',html);
 }
 _interchange(){
     // inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
-    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+    // inputWeight.closest('.form__row').classList.toggle('form__row--hidden');
     
 }
 

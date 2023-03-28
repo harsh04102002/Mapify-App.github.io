@@ -65,7 +65,7 @@
     width: 0;
   }
   
-  .workout {
+  .order {
     background-color: var(--color-dark--2);
     border-radius: 5px;
     padding: 1.5rem 2.25rem;
@@ -76,7 +76,7 @@
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 0.75rem 1.5rem;
   }
-  .workout--running {
+  .order--running {
     border-left: 5px solid var(--color-brand--2);
   }
   .workout--cycling {
@@ -98,6 +98,7 @@
     font-size: 1.8rem;
     margin-right: 0.2rem;
     height: 0.28rem;
+    color: rgb(32, 210, 12);
   }
   
   .workout__value {
